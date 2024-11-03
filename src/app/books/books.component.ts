@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router, Routes, RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import {ActivatedRoute, Router, Routes} from '@angular/router';
 import {BookComponent} from './book/book.component';
 
 export const booksRoutes: Routes = [
@@ -7,16 +7,17 @@ export const booksRoutes: Routes = [
 ];
 
 @Component({
-    selector: 'app-books',
-    templateUrl: './books.component.html',
-    styleUrls: ['./books.component.css'],
-    standalone: true,
-    imports: [RouterOutlet]
+  selector: 'app-books',
+  templateUrl: './books.component.html',
+  styleUrls: ['./books.component.css']
 })
-export class BooksComponent {
+export class BooksComponent implements OnInit {
   constructor(private router: Router, private route: ActivatedRoute) { }
 
+  ngOnInit(): void {
+  }
+
   submit(value: string): void {
-    this.router.navigate(['./', value], {relativeTo: this.route}).then(r => {});
+    this.router.navigate(['./', value], {relativeTo: this.route});
   }
 }

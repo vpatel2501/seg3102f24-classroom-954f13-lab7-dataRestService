@@ -1,10 +1,9 @@
-import {Component, inject, OnInit} from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import {AbstractControl, FormArray, FormBuilder, FormControl, Validators} from '@angular/forms';
 import {Author, Book} from '../books/model/book';
 import {BooksService} from '../books/service/books.service';
-import { NgStyle, NgFor } from '@angular/common';
 
-function categoryValidator(control: FormControl<string>): { [s: string]: boolean } | null {
+function categoryValidator(control: FormControl): { [s: string]: boolean } | null {
   const validCategories = ['Kids', 'Tech', 'Cook'];
   if (!validCategories.includes(control.value)) {
     return {invalidCategory: true};
@@ -13,15 +12,11 @@ function categoryValidator(control: FormControl<string>): { [s: string]: boolean
 }
 
 @Component({
-    selector: 'app-admin',
-    templateUrl: './admin.component.html',
-    styleUrls: ['./admin.component.css'],
-    standalone: true,
-    imports: [NgStyle, FormsModule, ReactiveFormsModule, NgFor]
+  selector: 'app-admin',
+  templateUrl: './admin.component.html',
+  styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
-  private builder: FormBuilder = inject(FormBuilder);
-  private booksService: BooksService = inject(BooksService);
   message: string = '';
   hideMsg = true;
   msgStyle = {
@@ -54,6 +49,10 @@ export class AdminComponent implements OnInit {
     return this.bookForm.get('authors') as FormArray;
   }
 
+  constructor(private builder: FormBuilder,
+              private booksService: BooksService) {
+  }
+
   ngOnInit(): void {
   }
 
@@ -70,25 +69,24 @@ export class AdminComponent implements OnInit {
 
   onSubmit(): void {
     const book = new Book(0,
-      <string>this.bookForm.value.category,
-      <string>this.bookForm.value.title,
+      this.bookForm.value.category,
+      this.bookForm.value.title,
       Number(this.bookForm.value.cost),
       [],
       Number(this.bookForm.value.year),
-      <string>this.bookForm.value.description);
-    const authors = <Author[]>this.bookForm.value.authors;
-    this.booksService.addBook(book).subscribe({
-      next: (response) => {
+      this.bookForm.value.description);
+    const authors = this.bookForm.value.authors;
+    this.booksService.addBook(book).subscribe(
+      (response) => {
         authors.forEach(
           (author: Author) => {
-            this.booksService.getAuthorsNamed(author.firstName, author.lastName).subscribe({
-                next: (authorList: Author[]) => {
-                  if (authorList === undefined || authorList.length === 0) {
-                    this.booksService.addBookAuthor(response.id, author).subscribe();
-                  } else {
-                    // *** Assumes unique firstName/LastName for Authors
-                    this.booksService.updateBookAuthors(response.id, authorList[0].id).subscribe();
-                  }
+            this.booksService.getAuthorsNamed(author.firstName, author.lastName).subscribe(
+              (authorList: Author[]) => {
+                if (authorList === undefined || authorList.length === 0) {
+                  this.booksService.addBookAuthor(response.id, author).subscribe();
+                } else {
+                  // *** Assumes unique firstName/LastName for Authors
+                  this.booksService.updateBookAuthors(response.id, authorList[0].id).subscribe();
                 }
               }
             );
@@ -96,10 +94,10 @@ export class AdminComponent implements OnInit {
         );
         this.showMessage('info', `The was successfully added with id ${response.id}`);
       },
-      error: (_: any) => {
+      (_: any) => {
         this.showMessage('error', 'Unable to add the book');
       }
-    });
+    );
     this.bookForm.reset();
     this.authors.clear();
   }
@@ -117,3 +115,4 @@ export class AdminComponent implements OnInit {
     this.authors.removeAt(i);
   }
 }
+

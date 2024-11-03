@@ -2,8 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 import {Author} from '../books/model/book';
 
 @Pipe({
-    name: 'authornames',
-    standalone: true
+  name: 'authornames'
 })
 export class AuthornamesPipe implements PipeTransform {
 
