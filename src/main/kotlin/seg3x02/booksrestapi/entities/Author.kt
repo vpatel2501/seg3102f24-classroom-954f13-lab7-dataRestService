@@ -1,6 +1,6 @@
 package seg3x02.booksrestapi.entities
 
-import jakarta.persistence.*
+import javax.persistence.*
 
 @Entity
 class Author {
